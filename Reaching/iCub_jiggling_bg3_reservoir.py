@@ -159,7 +159,7 @@ goal_history, parameter_history = preproc(num_goals)
 
 ph = np.zeros((num_trials,4,6))
 
-print('Trainning reservoir')
+print('Training reservoir')
 for t in range(num_trials):
     current_goal =  goal_history[t%num_goals]
     current_parms =   np.copy(parameters_per_goal(current_goal))

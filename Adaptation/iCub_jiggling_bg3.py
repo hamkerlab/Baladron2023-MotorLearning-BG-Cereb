@@ -8,7 +8,7 @@
 from ANNarchy import *
 from bg_loop3 import *
 from kinematic import *
-from reservoir_prediction import *
+
 
 
 
@@ -261,7 +261,6 @@ def train_bg(nt):
         Inj_Curr.r = 0.0
         Intermediate.baseline=0.0
         StrD1_putamen.baseline=0.0
-        STN.baseline = 0.0
         StrD1_putamen.r= 0.0
         PM.baseline = 0.0
         SNr_putamen.r = 1.1
