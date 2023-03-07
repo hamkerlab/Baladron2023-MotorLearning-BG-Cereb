@@ -22,8 +22,8 @@ import numpy as np
 from numpy import cross, eye, dot
 from scipy.linalg import expm, norm
 
-sim = sys.argv[1]
-print(sim)
+#sim = sys.argv[1]
+#print(sim)
 
 compile()
 setup(num_threads=2)
@@ -319,7 +319,7 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
     angle_history3[t] = np.degrees( angle_in_plane(rotated_proj,current_goal,perpendicular_normalized) )
     cerror[t] = error
 
-np.save(sim+'angle3.npy',angle_history3) #Directional error
-np.save(sim+'cerror.npy',cerror) #Aiming error
+np.save('angle3.npy',angle_history3) #Directional error
+np.save('cerror.npy',cerror) #Aiming error
 
 

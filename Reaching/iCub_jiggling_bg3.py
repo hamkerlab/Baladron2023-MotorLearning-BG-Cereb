@@ -40,7 +40,7 @@ MN_Layer_F = []
 myT = fSetTiming()
 
 
-sim =  sys.argv[1]
+#sim =  sys.argv[1]
 
 # Create list of CPG objects
 myCont = fnewMLMPcpg(params.number_cpg)
@@ -317,7 +317,7 @@ def train_bg(nt):
         error_history[trial] = np.linalg.norm(final_pos-goal)
 
 
-    np.save(sim+'_error_history.npy',error_history)
+    np.save('error_history_bg.npy',error_history)
     return goals,parameter_history
 
 

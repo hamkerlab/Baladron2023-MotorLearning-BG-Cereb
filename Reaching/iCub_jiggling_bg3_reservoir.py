@@ -18,8 +18,6 @@ import sys
 import time
 import numpy as np
 
-sim = sys.argv[1]
-print(sim)
 
 compile()
 setup(num_threads=2)
@@ -242,9 +240,5 @@ for t in range(num_trials):
 
 
 
-np.save(sim+'error.npy',error_history)
-np.save(sim+'dh.npy',dh)
-#Wi.save_connectivity(filename='Wi.data')
-#Wrec.save_connectivity(filename='Wrec.data')
+np.save('error.npy',error_history)
 
-np.save('pm.npy',mpm.get('r'))

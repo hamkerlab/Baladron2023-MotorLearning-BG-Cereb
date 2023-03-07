@@ -48,7 +48,7 @@ MN_Layer_F = []
 myT = fSetTiming()
 
 
-sim =  sys.argv[1]
+#sim =  sys.argv[1]
 #print(sim)
 
 # Create list of CPG objects
@@ -347,8 +347,8 @@ def train_bg(nt):
             parameter_history[trial-num_trials_test] = pms
             distance_history[trial-num_trials_test] = np.linalg.norm(final_pos-goal)
 
-    np.save(sim+'_error_history.npy',error_history)
-    np.save(sim+'_distance_history.npy',distance_history)
+    np.save('error_history_bg.npy',error_history)
+
     
     return goals,parameter_history
 
@@ -553,36 +553,9 @@ def preproc(num_goals):
         parameter_history[i] = parameters_per_goal(goals[i])
    '''
 
-    np.save(sim+'g.npy',g)
-    np.save(sim+'p.npy',p)
+
 
 
     return g,p
 
-#compile()
-#g, p = preproc(2)
-#np.save(sim+'g.npy',g)
-#np.save(sim+'p.npy',p)
-
-
-#StrD1SNr_putamen.save_connectivity(filename=sim+'_weights_sd1_snr2.data')
-
-#StrD1SNc_put.save_connectivity(filename=sim+'_weights_sd1_snc.data')
-
-
-#np.save('reward.npy',reward_history)
-#np.save(sim+'_norm.npy',norm_history)
-
-#np.save(sim+'_angle_history.npy',angle_history) #!!!!
-
-
-#np.save('/scratch/icub/sd1.npy',msd1.get('r'))
-#np.save('/scratch/icub/strthal.npy',mstrthal.get('r'))
-#np.save('/scratch/icub/snr.npy',msnr.get('r'))
-#np.save('/scratch/icub/snrt.npy',msnrt.get('trace'))
-#np.save('/scratch/icub/va.npy',mva.get('r'))
-#np.save('/scratch/icub/pm.npy',mpm.get('r'))
-#np.save('/scratch/icub/snc.npy',msnc.get('r'))
-#np.save('inter.npy',minter.get('r'))
-#np.save('strd1snr.npy',StrD1SNr_putamen.w)
 
