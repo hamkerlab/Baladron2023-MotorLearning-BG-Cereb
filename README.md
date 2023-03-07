@@ -11,21 +11,23 @@ The code in the folder `Reaching/` contains the model definitions and implements
 The code in the folder `Adaptation/` are the version of the files required for simulating the adaptation task. The three conditions of the task can be simulated by making the appropriate changes in `iCub_jiggling_reservoir.py`. The same model definitions as in `Reaching/` are required.
 
 To run a simulation: python3 iCub_jiggling_reservoir.py
-This will initialize the random concrete action, run the initial basal ganglia training and then run the full model simulation with 2 or 8 goals
+This will initialize the random concrete action, run the initial basal ganglia training and then run the full model simulation with 2 or 8 goals. A full simulation will take several hours.
 
 The basic requirement is having installed ANNarchy (https://annarchy.readthedocs.io/en/latest/). 
 ANNarchy requirements are the following:
-g++ >= 4.8
-make >= 3.0
-python >= 3.6 (with the development files, e.g. python-dev or python-devel)
-cython >= 0.20
-setuptools >= 40.0
-numpy >= 1.13
-sympy >= 1.6
-scipy >= 0.19
-matplotlib >= 2.0
+/*:
+  + g++ >= 4.8
+  + make >= 3.0
+  + python >= 3.6 (with the development files, e.g. python-dev or python-devel)
+  + cython >= 0.20
+  + setuptools >= 40.0
+  + numpy >= 1.13
+  + sympy >= 1.6
+  + scipy >= 0.19
+  +matplotlib >= 2.0
+ */
 
-The code has only been tested on linux using python 3.9 and 3.8 and ANNarchy version 4.6 or 4.7 . We can not assure it will work on other versions.
+The code has only been tested on linux Ubuntu 22.4 Mint 20.2, using python 3.9 and 3.8 and ANNarchy version 4.6 or 4.7. We can not assure it will work on other versions.
 
 The code will output two files:
 error_history_bg.npy which is a numpy array with the error on each trial of the initial basal ganglia training procedure
