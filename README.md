@@ -13,9 +13,10 @@ The code in the folder `Adaptation/` are the version of the files required for s
 To run a simulation: python3 iCub_jiggling_reservoir.py
 This will initialize the random concrete action, run the initial basal ganglia training and then run the full model simulation with 2 or 8 goals. A full simulation will take several hours.
 
-The basic requirement is having installed ANNarchy (https://annarchy.readthedocs.io/en/latest/). 
+The basic requirement is having installed ANNarchy (https://annarchy.readthedocs.io/en/latest/). Installation instrucions for Linux and Mac are available in the oficial ANNarchy documentation.
+
 ANNarchy requirements are the following:
-/*:
+:
   + g++ >= 4.8
   + make >= 3.0
   + python >= 3.6 (with the development files, e.g. python-dev or python-devel)
@@ -25,7 +26,7 @@ ANNarchy requirements are the following:
   + sympy >= 1.6
   + scipy >= 0.19
   +matplotlib >= 2.0
- */
+ 
 
 The code has only been tested on linux Ubuntu 22.4 Mint 20.2, using python 3.9 and 3.8 and ANNarchy version 4.6 or 4.7. We can not assure it will work on other versions.
 
