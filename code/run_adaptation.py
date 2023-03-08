@@ -1,7 +1,6 @@
 # Parameters
 num_goals = 2 # Number of goals. 2 or 8 in the manuscript
 simulation_type = 0 # Set to 0 to train the BG and 1 to use the reservoir alone
-num_trials_test = 100 # Number of test trials with the reservoir
 num_rotation_trials = 200 # Number of rotation trials
 num_test_trials = 200 # Number of test trials
 
@@ -95,10 +94,7 @@ Inj_Curr.factor_exc = 1.0
 def gaussian_input(x,mu,sig):
     return np.exp(-np.power(x-mu,2.)/(2*np.power(sig,2)))
 
-distance_history = np.zeros(num_trials_test)
-goal_history= np.zeros((num_trials_test,3))
-parameter_history = np.zeros((num_trials_test,4,6))
-final_pos_history = np.zeros((num_trials_test,3))
+
 
 hc_goals = [ [0.3286242/2.,  0.33601961/2., 0.55/2.], [-0.8713758/2.,   0.3360196/2.,  0.55/2.]]
 
