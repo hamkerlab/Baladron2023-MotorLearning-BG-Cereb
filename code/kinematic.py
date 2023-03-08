@@ -13,6 +13,7 @@ Definition of the kinematics module.
 """
 
 import numpy as np
+import math
 
 def G(a, d, alph, theta):
 
