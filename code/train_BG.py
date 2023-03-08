@@ -1,46 +1,35 @@
+import importlib
+import sys
+import time
+import numpy as np
+
+# ANNarchy
 from ANNarchy import *
-from bg_loop3 import *
+
+# Model
+from basalganglia import *
 from kinematic import *
 
-
-
-#import yarp
-#import CPG_lib.iCub_connect.iCub_connect as robot_connect
+# CPG
 import CPG_lib.parameter as params
 from CPG_lib.MLMPCPG.MLMPCPG import *
 from CPG_lib.MLMPCPG.myPloting import *
 from CPG_lib.MLMPCPG.SetTiming import *
 
 
-import importlib
-import sys
-import time
-import numpy as np
-#compile()
-setup(num_threads=1)
-
-
-
-
-#initialize robot connection
+# Initialize robot connection
 sys.path.append('../../CPG_lib/MLMPCPG')
 sys.path.append('../../CPG_lib/icubPlot')
 iCubMotor = importlib.import_module(params.iCub_joint_names)
+
+
 global All_Command
 global All_Joints_Sensor
 global myCont, angles, myT
 All_Command = []
 All_Joints_Sensor = []
-RG_Layer_E = []
-RG_Layer_F = []
-PF_Layer_E = []
-PF_Layer_F = []
-MN_Layer_E = []
-MN_Layer_F = []
+
 myT = fSetTiming()
-
-
-#sim =  sys.argv[1]
 
 # Create list of CPG objects
 myCont = fnewMLMPcpg(params.number_cpg)
@@ -115,7 +104,7 @@ def execute_movement(pms,current_angles):
     for i in range(0, len(myCont)):
         myCont[i].fUpdateInitPos(current_angles[i])
 
-    #execute a movement
+    # Execute a movement
     for i in AllJointList:
             myCont[i].fUpdateLocomotionNetwork(myT, current_angles[i])
     for idx, controller in enumerate(myCont):
@@ -255,7 +244,7 @@ def train_bg(nt):
             goal = random_goal2(initial_position)
             
 
-        neuron_update2(Cortical_input,goal,10.0,0.5) #0.2,1 // 0.005,1.0 IN ORIGINAL
+        neuron_update(Cortical_input,goal, 10.0, 0.5) #0.2,1 // 0.005,1.0 IN ORIGINAL
         simulate(200)
         
         
@@ -299,7 +288,7 @@ def train_bg(nt):
         nn= 0.0
 
         Cortical_input.baseline=0.0
-        neuron_update2(Cortical_input,final_pos,10.0,0.5)
+        neuron_update(Cortical_input, final_pos, 10.0, 0.5)
         simulate(100)
         print(final_pos)
 
@@ -318,7 +307,8 @@ def train_bg(nt):
 
 
     np.save('error_history_bg.npy',error_history)
-    return goals,parameter_history
+    
+    return goals, parameter_history
 
 
 
@@ -363,13 +353,10 @@ def parameters_per_goal(goal):
 
     Cortical_input.baseline=0.0
 
-    #inter trial
+    # inter-trial
     simulate(700)
 
-
-
-
-    neuron_update2(Cortical_input,goal,10.0,0.5) #0.2,1 // 0.005,1.0 IN ORIGINAL
+    neuron_update(Cortical_input, goal, 10.0, 0.5) #0.2,1 // 0.005,1.0 IN ORIGINAL
     simulate(200)
 
 
@@ -397,13 +384,6 @@ def parameters_per_goal(goal):
 
     print(pms)
     return pms
-
-def preproc(num_goals):
-
-    g,p = train_bg(num_goals)
-
-
-    return g,p
 
 
 

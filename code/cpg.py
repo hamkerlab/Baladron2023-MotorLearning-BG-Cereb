@@ -1,9 +1,7 @@
-from ANNarchy import *
-import matplotlib.pyplot as plt
 import os.path
 from scipy.stats import multivariate_normal
-#import pickle5 as pickle
-import pickle
+
+from ANNarchy import *
 
 LinearNeuron = Neuron(
     parameters= """
@@ -35,11 +33,6 @@ LinearNeuron_saturated = Neuron(
     """
 )
 
-
-
-
-#tau = 1000
-#regularization_threshold good =0.5
 PositiveCovariance = Synapse(
     parameters="""
         tau = 500.0 
@@ -47,16 +40,15 @@ PositiveCovariance = Synapse(
         regularization_threshold = 100.2
         threshold_post = 0.0
         threshold_pre = 0.3
-    """,
+    """,
     equations="""
         tau_alpha*dalpha/dt + alpha = pos(post.r - regularization_threshold)
         trace = pos(pre.r - mean(pre.r) - threshold_pre) * (post.r  - mean(post.r) - threshold_post)
         delta = trace 
         tau*dw / dt = delta : min=0
-   """
+    """
 )
 
-#tau = 900
 PostCovariance = Synapse(
     parameters="""
         tau = 100.0
@@ -64,20 +56,19 @@ PostCovariance = Synapse(
         regularization_threshold = 1.5
         threshold_post = 0.0
         threshold_pre = 0.0
-    """,
+    """,
     equations="""
         tau_alpha*dalpha/dt + alpha = pos(post.r - regularization_threshold)
         trace = (pre.r - mean(pre.r) - threshold_pre) * pos(post.r  - mean(post.r)-threshold_post)
         delta = trace - alpha*pos(post.r-mean(post.r) - threshold_post)*pos(post.r-mean(post.r) - threshold_post)*w
         tau*dw / dt = delta : min=0
-   """
+    """
 )
 
 
 prename = 'lalalalala' #'40prim2'
 
 weight_local_inh = 1.0 #1.0
-
 
 num_cell_per_parm = 20
 num_cell_per_ax = 20
@@ -142,7 +133,7 @@ for i in range(num_joints):
         print('loading weights from file')
         temp.connect_from_file(filename=prename+'weights_RG_Pat1_'+str(i)+'.data')
     else:
-        print('resetting the connectivity')
+        print('Resetting the connectivity...')
         temp.connect_all_to_all(weights=Uniform(0.1,0.5)) #weights=0.0)
     VelRG_Pat1.append(temp)
 
@@ -198,13 +189,13 @@ for i in range(num_joints):
 
 VelInjCurr = []
 for i in range(num_joints):
-    temp = Projection(pre=Intermediate,post=Inj_Curr[i,:],target='exc') #,synapse=PositiveCovariance)
+    temp = Projection(pre=Intermediate,post=Inj_Curr[i,:], target='exc') #,synapse=PositiveCovariance)
     if(os.path.isfile(prename+'weights_InjCurr'+str(i)+'.data')):
         temp.connect_from_file(filename=prename+'weights_InjCurr'+str(i)+'.data')
-        print('inj current from file')
+        print('Injecting current from file...')
     else:
         temp.connect_all_to_all(weights=0.0)
-        print('inj from scratch')
+        print('Injecting current from scratch...')
     VelInjCurr.append(temp)
 
 
@@ -242,12 +233,9 @@ def gs2(velocity,max_position):
 def gaussian(x,mu, sig):
     return np.exp(-(np.power(x[0] - mu[0], 2.) / (2 * np.power(sig[0], 2.)) + np.power(x[1] - mu[1], 2.) / (2 * np.power(sig[1], 2.)) + np.power(x[2] - mu[2], 2.) / (2 * np.power(sig[2], 2.))))
 
-def neuron_update(velocity,factor):
-    g = gs(velocity) 
-    Hand_velocity.baseline = g*factor 
 
-def neuron_update2(population,velocity,factor,max_position):
-    g = gs2(velocity,max_position) 
+def neuron_update(population, velocity, factor, max_position):
+    g = gs2(velocity, max_position) 
     population.baseline = g*factor/(np.sum(g)) 
     
 

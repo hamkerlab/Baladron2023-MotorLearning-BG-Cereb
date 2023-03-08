@@ -1,6 +1,6 @@
 from ANNarchy import *
-from motor_jiggling_intermediate import *
-#import pickle5 as pickle
+
+from cpg import *
 import pickle
 
 LinearNeuron_trace = Neuron(
@@ -296,8 +296,6 @@ reward_inh = Population(geometry=1,neuron=LinearNeuron)
 
 
 factor = 1.0
-
-
 
 
 StrThalStrThal_putamen = Projection(pre=StrThal_putamen,post=StrThal_putamen,target='inh')

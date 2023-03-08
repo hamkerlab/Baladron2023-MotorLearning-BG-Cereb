@@ -6,7 +6,7 @@
 
 
 from ANNarchy import *
-from bg_loop3 import *
+from basalganglia import *
 from kinematic import *
 
 
@@ -127,13 +127,6 @@ initial_position = wrist_position(np.radians(angles[joints]))[0:3]
 
 def gaussian_input(x,mu,sig):
              return np.exp(-np.power(x-mu,2.)/(2*np.power(sig,2)))
-
-
-
-
-
-
-
 
 
 
@@ -288,7 +281,7 @@ def train_bg(nt):
         vel_d = (goal-initial_position) 
 
         vel_d = vel_d 
-        neuron_update2(Cortical_input,goal,10.0,0.5)
+        neuron_update(Cortical_input,goal,10.0,0.5)
         simulate(200)
 
 
@@ -502,7 +495,7 @@ def parameters_per_goal(goal):
     vel_d = goal
     
     
-    neuron_update2(StrD1_putamen,goal,1.0,1.0) #0.2,1 // 0.005,1.0 IN ORIGINAL
+    neuron_update(StrD1_putamen, goal, 1.0, 1.0) #0.2,1 // 0.005,1.0 IN ORIGINAL
 
     simulate(200)
 
@@ -537,25 +530,5 @@ def parameters_per_goal(goal):
 
     return pms #primitive
 
-
-
-def preproc(num_goals):
-
-    g,p = train_bg(num_goals)
-
-    '''
-    goals = np.zeros((num_goals,3))
-    for i in range(num_goals):
-        goals[i]= random_goal(initial_position)
-
-    parameter_history = np.zeros((num_goals,4,6))
-    for i in range(num_goals):
-        parameter_history[i] = parameters_per_goal(goals[i])
-   '''
-
-
-
-
-    return g,p
 
 

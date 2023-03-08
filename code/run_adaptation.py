@@ -1,49 +1,40 @@
-	
-from ANNarchy import *
-#from motor_jiggling_intermediate import *
-#from bg_loop3 import *
-from reservoir_bg3 import *
-#from reservoir_prediction import *
-from kinematic import *
-from iCub_jiggling_bg3 import *
+# Parameters
+num_goals = 2 # Number of goals. 2 or 8 in the manuscript
+simulation_type = 0 # Set to 0 to train the BG and 1 to use the reservoir alone
+num_trials_test = 100 # Number of test trials with the reservoir
+num_rotation_trials = 200 # Number of rotation trials
+num_test_trials = 200 # Number of test trials
 
-#import yarp
-#import CPG_lib.iCub_connect.iCub_connect as robot_connect
+# Imports
+import importlib
+import sys
+import time
+import numpy as np
+from numpy import cross, eye, dot
+from scipy.linalg import expm, norm
+
+# Import ANNarchy
+from ANNarchy import *
+setup(num_threads=2)
+
+# Model
+from reservoir import *
+from kinematic import *
+from train_BG_adaptation import *
+
+# CPG
 import CPG_lib.parameter as params
 from CPG_lib.MLMPCPG.MLMPCPG import *
 from CPG_lib.MLMPCPG.myPloting import *
 from CPG_lib.MLMPCPG.SetTiming import *
 
-import importlib
-import sys
-import time
-import numpy as np
-
-from numpy import cross, eye, dot
-from scipy.linalg import expm, norm
-
-#sim = sys.argv[1]
-#print(sim)
-
+# Compile the network
 compile()
-setup(num_threads=2)
-#setup(dt=0.66)
 
-#initialize robot connection
+# Initialize robot connection
 sys.path.append('../../CPG_lib/MLMPCPG')
 sys.path.append('../../CPG_lib/icubPlot')
 iCubMotor = importlib.import_module(params.iCub_joint_names)
-global All_Command
-global All_Joints_Sensor
-global myCont, angles, myT
-All_Command = []
-All_Joints_Sensor = []
-RG_Layer_E = []
-RG_Layer_F = []
-PF_Layer_E = []
-PF_Layer_F = []
-MN_Layer_E = []
-MN_Layer_F = []
 myT = fSetTiming()
 
 # Create list of CPG objects
@@ -59,7 +50,7 @@ myCont = fSetCPGNet(myCont, params.my_iCub_limits, params.positive_angle_dir)
     LThumbDistal, LIndexProximal, LIndexDistal, LMiddleProximal, LMiddleDistal, LPinky, LHipPitch, LHipRoll, LHipYaw, LKnee, \
     LAnklePitch, LAnkleRoll
 """
-# Initiate PF and RG patterns for the joints
+
 # Initiate PF and RG patterns for the joints
 joint1 = iCubMotor.LShoulderRoll
 joint2 = iCubMotor.LElbow
@@ -69,13 +60,9 @@ joints = [joint4,joint3,joint1,joint2]
 AllJointList = joints
 num_joints = 4
 angles = np.zeros(params.number_cpg)
-
-
 angles[iCubMotor.LShoulderPitch] = 40
 angles[iCubMotor.LElbow] = -10
 #angles = np.radians(angles)
-
-
 
 # Update CPG initial position (reference position)
 for i in range(0, len(myCont)):
@@ -95,11 +82,6 @@ for ff in range(num_joints):
     VelPF_Pat1[ff].disable_learning()
     VelPF_Pat2[ff].disable_learning()
     VelInjCurr[ff].disable_learning()
-#VelInter.disable_learning()
-
-#Hand_velocity.disable()
-
-
 
 RG_Pat1.factor_exc = 1.0
 RG_Pat2.factor_exc = 1.0
@@ -110,47 +92,29 @@ PF_Pat2.factor_exc = 1.0
 Inj_Curr.factor_exc = 1.0
 
 
-#VelInter.transmission = False
-
 def gaussian_input(x,mu,sig):
              return np.exp(-np.power(x-mu,2.)/(2*np.power(sig,2)))
 
 
-num_trials_test = 100
 
 distance_history = np.zeros(num_trials_test)
 goal_history= np.zeros((num_trials_test,3))
 parameter_history = np.zeros((num_trials_test,4,6))
 final_pos_history = np.zeros((num_trials_test,3))
 
-
 hc_goals = [ [0.3286242/2.,  0.33601961/2., 0.55/2.], [-0.8713758/2.,   0.3360196/2.,  0.55/2.]]
-
-
-
-
-
 
 max_angle = 0
 num_tests = 0
 a = [0,0,0]
 
-
 #train_bg(0)
 #StrD1SNr_putamen.disable_learning()
 #StrD1SNc_put.disable_learning()
 
-
-
-
 pop.enable()
 
-num_goals = 2
-
 num_trials = num_goals*300 #600
-
-num_rotation_trials = 200
-num_test_trials = 200
 
 error_history = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 angle_history = np.zeros(num_trials+num_rotation_trials+num_test_trials)
@@ -184,19 +148,14 @@ def rotation_matrix(axis, theta):
 
 
 
-#BG controller
-goal_history, parameter_history = preproc(num_goals)
+# BG controller
+goal_history, parameter_history = train_bg(num_goals)
 
-StrD1SNr_putamen.disable_learning()
+#StrD1SNr_putamen.disable_learning()
 StrD1SNc_put.disable_learning()
-
-
 
 def M(axis, theta):
     return expm(cross(eye(3), axis/norm(axis)*theta))
-
-
-
 
 
 def unit_vector(vector):
@@ -228,14 +187,22 @@ def angle_in_plane(v1,v2,n):
 
 cerror = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 
+
+# Reservoir
+
+# Compute the mean reward per trial
+R_mean = np.zeros(100)
+alpha = 0.33 #0.75 0.33 
+
 for t in range(num_trials+num_rotation_trials+num_test_trials):
 
+    # Select goal
     goal_id = t%num_goals
     if(t>num_trials):
         goal_id = 0
     current_goal =  goal_history[goal_id]   
     
-
+    # Initialize reser4voir
     pop.x = Uniform(-0.01, 0.01).get_values(N)
     pop.r = np.tanh(pop.x)
     pop[1].r = np.tanh(1.0)
@@ -243,24 +210,21 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
     pop[11].r = np.tanh(-1.0)
 
 
-
+    # Set input
     inp[goal_id].r = 1.0
-    
     simulate(200)
 
+    # ISI
     inp.r  = 0.0
-
     simulate(200)
 
     rec = m.get()
-    
     output = rec['r'][-200:,-24:]
     output = np.mean(output,axis=0)
 
 
     if(simulation_type==0):
-        output=output*2
-
+        output = output*2
 
     current_parms = np.zeros((4,6))
     if(simulation_type == 0):
@@ -272,7 +236,6 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
 
     if(t>-1):
         current_parms+=output.reshape((4,6))        
-
     
     s = 0
     pf = ''
@@ -292,14 +255,12 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
         distance = np.linalg.norm(final_pos-goal_history[2]) 
     error = distance 
 
-
+    # Plasticity
     if(t>10):
         # Apply the learning rule
         Wrec.learning_phase = 1.0
         Wrec.error = error
         Wrec.mean_error = R_mean[goal_id]
-
-
 
         # Learn for one step
         step()
@@ -310,16 +271,16 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
         _ = m.get()
 
 
-    
     R_mean[goal_id] = alpha * R_mean[goal_id] + (1.- alpha) * error
     error_history[t] = error
+
     rotated_proj = project_onto_plane(final_pos,perpendicular_vector)
     angle_history[t]  = np.degrees( angle_between(rotated_proj, current_goal))
     angle_history2[t] = np.degrees( angle_between(current_goal, initial_position) - angle_between(rotated_proj,initial_position) )
     angle_history3[t] = np.degrees( angle_in_plane(rotated_proj,current_goal,perpendicular_normalized) )
     cerror[t] = error
 
-np.save('angle3.npy',angle_history3) #Directional error
-np.save('cerror.npy',cerror) #Aiming error
+np.save('angle3.npy',angle_history3) # Directional error
+np.save('cerror.npy',cerror) # Aiming error
 
 

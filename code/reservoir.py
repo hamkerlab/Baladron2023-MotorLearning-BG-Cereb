@@ -1,10 +1,7 @@
 from ANNarchy import *
-import matplotlib.pyplot as plt
-import os.path
-from scipy.stats import multivariate_normal
-import pickle
 
-neuron = Neuron(
+
+RC_neuron = Neuron(
     parameters = """
         tau = 30.0 : population # Time constant
         constant = 0.0 # The four first neurons have constant rates
@@ -32,7 +29,7 @@ neuron = Neuron(
 
 #changed weight change to positive
 #eta * trace * (mean_error) * (error - mean_error)
-synapse = Synapse(
+TraceMiconi = Synapse(
     parameters="""
         eta = 0.8: projection # Learning rate 0.5 -- 0.6 in icubs_bg/2
         learning_phase = 0.0 : projection # Flag to allow learning only at the end of a trial
@@ -62,11 +59,9 @@ synapse = Synapse(
 inp = Population(9, Neuron(parameters="r=0.0"))
 inp.r = 0.0
 
-
-
 # Recurrent population
 N = 400
-pop = Population(N, neuron)
+pop = Population(N, RC_neuron)
 pop[1].constant = 1.0
 pop[10].constant = 1.0
 pop[11].constant = -1.0
@@ -78,13 +73,9 @@ Wi.connect_all_to_all(weights=Uniform(-0.2, 0.2))
 
 
 # Recurrent weights
-g = 1.0 #1.0
-Wrec = Projection(pop,pop,'exc',synapse)  
+g = 1.0 
+Wrec = Projection(pop, pop,'exc', TraceMiconi)  
 Wrec.connect_all_to_all(weights=Normal(0., g/np.sqrt(N)), allow_self_connections=True)
-
-# Compute the mean reward per trial
-R_mean = np.zeros(100)
-alpha = 0.33 #0.75 0.33 
 
 
 m = Monitor(pop,['r'])
