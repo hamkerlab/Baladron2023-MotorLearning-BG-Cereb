@@ -1,9 +1,16 @@
-#THIS CODE ONLY DIFFERS FROM THE REACHING VERSION IN THAT IT COMPUTES
-#THE CONCRETE ACTION FOR THE ROTATED VERSION OF THE FIRST GOAL
-#THIS ALLOWS TO CHANGE FAST THE MOTOR GOAL DURING THE SIMULATION OF THE ADAPTATION EXPERIMENT.
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+"""
+Code for the paper: 
 
+Baladron, J., Vitay, J., Fietzek, T. and Hamker, F. H.
+The contribution of the basal ganglia and cerebellum to motor learning: a neuro-computational approach.
 
+Copyright the Authors (License MIT)
+
+Training procedure of the basal ganglia module in the adaptation task.
+"""
 
 from ANNarchy import *
 from basalganglia import *
@@ -223,6 +230,7 @@ def train_bg(nt):
 
     for trial in range(num_trials_test+nt+1):
 
+        print("trial", trial)
 
         RG_Pat1.noise = 0.0
         RG_Pat2.noise = 0.0

@@ -17,7 +17,6 @@ Script for the reaching task.
 # Parameters
 num_goals = 2 # Number of goals. 2 or 8 in the manuscript
 num_goals_per_trial = 300 # Number of trials per goal
-simulation_type = 0 # Set to 0 to train the BG and 1 to use the reservoir alone
 num_trials_test = 100 # Number of test trials with the reservoir
 
 
@@ -175,22 +174,11 @@ for t in range(num_trials):
     
     # Compute output
     output = rec['r'][-200:,-24:]
-    output = np.mean(output,axis=0)
+    output = np.mean(output,axis=0) * 2
 
-    if(simulation_type==0):
-        output=output*2
     
     if(t > -1):
-        current_params+=output.reshape((4,6))
-    
-    if(simulation_type == 1):
-
-        current_params[:,0] = np.clip( (1+current_params[:,0])*(5.0/2.0),0.001,5)  
-        current_params[:,1] = np.clip( (1+current_params[:,1])*(5.0/2.0),0.001,5) 
-        current_params[:,2] = np.clip(current_params[:,2]*4,-4,4)  
-        current_params[:,3] = np.clip( (1+current_params[:,3])*(10.0/2.0),0.001,10)  
-        current_params[:,4] = np.clip( (1+current_params[:,4]),0.01,2.0)  
-        current_params[:,5] = np.clip( (1+current_params[:,5]),0.01,2.0)
+        current_params += output.reshape((4,6))
  
     can = np.copy(angles)
     final_pos = execute_movement(current_params,can)

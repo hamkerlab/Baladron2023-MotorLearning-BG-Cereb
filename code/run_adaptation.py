@@ -17,7 +17,6 @@ Script for the adaptation task.
 # Parameters
 num_goals = 2 # Number of goals. 2 or 8 in the manuscript
 num_goals_per_trial = 300 # Number of trials per goal
-simulation_type = 0 # Set to 0 to train the BG and 1 to use the reservoir alone
 num_rotation_trials = 200 # Number of rotation trials
 num_test_trials = 200 # Number of test trials
 strategy = 0 # Set to 1 to simulate a condition which includes an explicit instruction 
@@ -134,12 +133,14 @@ dh = np.zeros(num_trials)
 ###################
 # BG controller
 ###################
+print('Training BG')
 goal_history, parameter_history = train_bg(num_goals)
 
 
 ###################
 # Reservoir
 ###################
+print('Training reservoir')
 
 def M(axis, theta):
     return expm(cross(eye(3), axis/norm(axis)*theta))
@@ -205,15 +206,9 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
 
     rec = m.get()
     output = rec['r'][-200:,-24:]
-    output = np.mean(output,axis=0)
+    output = np.mean(output,axis=0) * 2.0
 
-
-    if(simulation_type==0):
-        output = output*2
-
-    current_params = np.zeros((4,6))
-    if(simulation_type == 0):
-        current_params =  np.copy(parameter_history[goal_id])
+    current_params =  np.copy(parameter_history[goal_id])
 
     # Turn this on for simulations with strategy
     if(strategy==1):
