@@ -1,6 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Code for the paper: 
+
+Baladron, J., Vitay, J., Fietzek, T. and Hamker, F. H.
+The contribution of the basal ganglia and cerebellum to motor learning: a neuro-computational approach.
+
+Copyright the Authors (License MIT)
+
+Script for the reaching task.
+
+> python run_adaptation.py
+"""
 
 # Parameters
 num_goals = 2 # Number of goals. 2 or 8 in the manuscript
+num_goals_per_trial = 300 # Number of trials per goal
 simulation_type = 0 # Set to 0 to train the BG and 1 to use the reservoir alone
 num_trials_test = 100 # Number of test trials with the reservoir
 
@@ -18,7 +34,7 @@ setup(num_threads=2)
 # Model
 from reservoir import *
 from kinematic import *
-from train_BG import *
+from train_BG_reaching import *
 
 # CPG
 import CPG_lib.parameter as params
@@ -115,19 +131,23 @@ num_tests = 0
 a = [0,0,0]
 
 pop.enable()
-num_trials = num_goals*300 #600
+num_trials = num_goals * num_goals_per_trial
 error_history = np.zeros(num_trials)
 dh = np.zeros(num_trials)
 
-# Training of the BG controller
-if simulation_type==0:
-    print('Training BG')
-    goal_history, parameter_history = train_bg(num_goals)
+###################
+# BG controller
+###################
+print('Training BG')
+goal_history, parameter_history = train_bg(num_goals)
 
 # Compute the mean reward per trial
-R_mean = np.zeros(100)
+R_mean = np.zeros(num_goals)
 alpha = 0.33 #0.75 0.33 
 
+###################
+# Reservoir
+###################
 print('Training reservoir...')
 for t in range(num_trials):
 

@@ -1,3 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Code for the paper: 
+
+Baladron, J., Vitay, J., Fietzek, T. and Hamker, F. H.
+The contribution of the basal ganglia and cerebellum to motor learning: a neuro-computational approach.
+
+Copyright the Authors (License MIT)
+
+Definition of the CPG module.
+"""
+
 import os.path
 from scipy.stats import multivariate_normal
 

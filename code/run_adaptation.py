@@ -1,9 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Code for the paper: 
+
+Baladron, J., Vitay, J., Fietzek, T. and Hamker, F. H.
+The contribution of the basal ganglia and cerebellum to motor learning: a neuro-computational approach.
+
+Copyright the Authors (License MIT)
+
+Script for the adaptation task.
+
+> python run_adaptation.py
+"""
+
 # Parameters
 num_goals = 2 # Number of goals. 2 or 8 in the manuscript
+num_goals_per_trial = 300 # Number of trials per goal
 simulation_type = 0 # Set to 0 to train the BG and 1 to use the reservoir alone
 num_rotation_trials = 200 # Number of rotation trials
 num_test_trials = 200 # Number of test trials
-
 strategy = 0 # Set to 1 to simulate a condition which includes an explicit instruction 
 rotation = 1 # Set to 1 to simulate a conditioon in which the 45 rotation is included
 
@@ -107,7 +123,7 @@ a = [0,0,0]
 
 pop.enable()
 
-num_trials = num_goals * 300 #600
+num_trials = num_goals * num_goals_per_trial
 
 error_history = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 angle_history3 = np.zeros(num_trials+num_rotation_trials+num_test_trials)
@@ -115,11 +131,15 @@ angle_history3 = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 
 dh = np.zeros(num_trials)
 
+###################
 # BG controller
-if(simulation_type==0):
-    goal_history, parameter_history = train_bg(num_goals)
+###################
+goal_history, parameter_history = train_bg(num_goals)
 
-StrD1SNc_put.disable_learning()
+
+###################
+# Reservoir
+###################
 
 def M(axis, theta):
     return expm(cross(eye(3), axis/norm(axis)*theta))
@@ -142,6 +162,7 @@ def project_onto_plane(x, n):
     p = d * normalize(n)
     return x-p
 
+StrD1SNc_put.disable_learning()
 
 perpendicular_vector = np.cross(goal_history[0],goal_history[1])
 perpendicular_normalized = perpendicular_vector/np.linalg.norm(perpendicular_vector)
@@ -154,21 +175,19 @@ def angle_in_plane(v1,v2,n):
 
 cerror = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 
-# Reservoir training
-
 # Compute the mean reward per trial
-R_mean = np.zeros(100)
+R_mean = np.zeros(num_goals)
 alpha = 0.33 #0.75 0.33 
 
 for t in range(num_trials+num_rotation_trials+num_test_trials):
 
     # Select goal
-    goal_id = t%num_goals
+    goal_id = t % num_goals
     if(t>num_trials):
         goal_id = 0
     current_goal =  goal_history[goal_id]   
     
-    # Initialize reser4voir
+    # Reinitialize reservoir
     pop.x = Uniform(-0.01, 0.01).get_values(N)
     pop.r = np.tanh(pop.x)
     pop[1].r = np.tanh(1.0)
@@ -192,24 +211,24 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
     if(simulation_type==0):
         output = output*2
 
-    current_parms = np.zeros((4,6))
+    current_params = np.zeros((4,6))
     if(simulation_type == 0):
-        current_parms =  np.copy(parameter_history[goal_id])
+        current_params =  np.copy(parameter_history[goal_id])
 
     # Turn this on for simulations with strategy
     if(strategy==1):
         if(t>(num_trials+2) and t<(num_trials+num_rotation_trials-10) ):
-            current_parms = np.copy(parameter_history[2])
+            current_params = np.copy(parameter_history[2])
 
     if(t>-1):
-        current_parms+=output.reshape((4,6))        
+        current_params+=output.reshape((4,6))        
     
     s = 0
     pf = ''
     if(t>(num_trials-3)):
         s = 1
         pf = str(t)
-    final_pos = execute_movement(current_parms,s,pf)
+    final_pos = execute_movement(current_params,s,pf)
 
     #Turn this on for simulations with perturbation
     if(rotation==1):
@@ -218,7 +237,8 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
 
 
     distance = np.linalg.norm(final_pos-current_goal)
-    #Activate this for simulations with strategy
+
+    # Activate this for simulations with strategy
     if(strategy==1):
         if(t>(num_trials) and t<(num_trials+num_rotation_trials)):
             distance = np.linalg.norm(final_pos-goal_history[2]) 
@@ -239,7 +259,7 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
         Wrec.trace = 0.0
         _ = m.get()
 
-
+    # Update mean error
     R_mean[goal_id] = alpha * R_mean[goal_id] + (1.- alpha) * error
     error_history[t] = error
 
@@ -247,7 +267,7 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
     angle_history3[t] = np.degrees( angle_in_plane(rotated_proj,current_goal,perpendicular_normalized) )
     cerror[t] = error
 
-np.save('angle3.npy',angle_history3) # Directional error
-np.save('cerror.npy',cerror) # Aiming error
+np.save('angle3.npy', angle_history3) # Directional error
+np.save('cerror.npy', cerror) # Aiming error
 
 
