@@ -4,6 +4,9 @@ simulation_type = 0 # Set to 0 to train the BG and 1 to use the reservoir alone
 num_rotation_trials = 200 # Number of rotation trials
 num_test_trials = 200 # Number of test trials
 
+strategy = 0 # Set to 1 to simulate a condition which includes an explicit instruction 
+rotation = 1 # Set to 1 to simulate a conditioon in which the 45 rotation is included
+
 # Imports
 import importlib
 import sys
@@ -107,8 +110,6 @@ pop.enable()
 num_trials = num_goals * 300 #600
 
 error_history = np.zeros(num_trials+num_rotation_trials+num_test_trials)
-angle_history = np.zeros(num_trials+num_rotation_trials+num_test_trials)
-angle_history2 = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 angle_history3 = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 #error_historyP = np.zeros(num_trials+10)
 
@@ -196,8 +197,9 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
         current_parms =  np.copy(parameter_history[goal_id])
 
     # Turn this on for simulations with strategy
-    if(t>(num_trials+2) and t<(num_trials+num_rotation_trials-10) ):
-        current_parms = np.copy(parameter_history[2])
+    if(strategy==1):
+        if(t>(num_trials+2) and t<(num_trials+num_rotation_trials-10) ):
+            current_parms = np.copy(parameter_history[2])
 
     if(t>-1):
         current_parms+=output.reshape((4,6))        
@@ -210,14 +212,16 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
     final_pos = execute_movement(current_parms,s,pf)
 
     #Turn this on for simulations with perturbation
-    if(t>num_trials and t<(num_trials+num_rotation_trials) ):
-        final_pos = np.dot(rot,final_pos) 
+    if(rotation==1):
+        if(t>num_trials and t<(num_trials+num_rotation_trials) ):
+            final_pos = np.dot(rot,final_pos) 
 
 
     distance = np.linalg.norm(final_pos-current_goal)
-    #Activate this for simulations with strategy 
-    if(t>(num_trials) and t<(num_trials+num_rotation_trials)):
-        distance = np.linalg.norm(final_pos-goal_history[2]) 
+    #Activate this for simulations with strategy
+    if(strategy==1):
+        if(t>(num_trials) and t<(num_trials+num_rotation_trials)):
+            distance = np.linalg.norm(final_pos-goal_history[2]) 
     error = distance 
 
     # Plasticity
@@ -240,8 +244,6 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
     error_history[t] = error
 
     rotated_proj = project_onto_plane(final_pos,perpendicular_vector)
-    angle_history[t]  = np.degrees( angle_between(rotated_proj, current_goal))
-    angle_history2[t] = np.degrees( angle_between(current_goal, initial_position) - angle_between(rotated_proj,initial_position) )
     angle_history3[t] = np.degrees( angle_in_plane(rotated_proj,current_goal,perpendicular_normalized) )
     cerror[t] = error
 
