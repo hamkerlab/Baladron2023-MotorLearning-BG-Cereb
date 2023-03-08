@@ -93,9 +93,7 @@ Inj_Curr.factor_exc = 1.0
 
 
 def gaussian_input(x,mu,sig):
-             return np.exp(-np.power(x-mu,2.)/(2*np.power(sig,2)))
-
-
+    return np.exp(-np.power(x-mu,2.)/(2*np.power(sig,2)))
 
 distance_history = np.zeros(num_trials_test)
 goal_history= np.zeros((num_trials_test,3))
@@ -108,13 +106,9 @@ max_angle = 0
 num_tests = 0
 a = [0,0,0]
 
-#train_bg(0)
-#StrD1SNr_putamen.disable_learning()
-#StrD1SNc_put.disable_learning()
-
 pop.enable()
 
-num_trials = num_goals*300 #600
+num_trials = num_goals * 300 #600
 
 error_history = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 angle_history = np.zeros(num_trials+num_rotation_trials+num_test_trials)
@@ -122,36 +116,12 @@ angle_history2 = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 angle_history3 = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 #error_historyP = np.zeros(num_trials+10)
 
-
 dh = np.zeros(num_trials)
 
-
-simulation_type = 0 #0 = with bg / 1 = direct parameters
-
-
-def rotation_matrix(axis, theta):
-    """
-    Return the rotation matrix associated with counterclockwise rotation about
-    the given axis by theta radians.
-    """
-    axis = np.asarray(axis)
-    axis = axis / math.sqrt(np.dot(axis, axis))
-    a = math.cos(theta / 2.0)
-    b, c, d = -axis * math.sin(theta / 2.0)
-    aa, bb, cc, dd = a * a, b * b, c * c, d * d
-    bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-    return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
-                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
-                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
-
-
-
-
-
 # BG controller
-goal_history, parameter_history = train_bg(num_goals)
+if(simulation_type==0):
+    goal_history, parameter_history = train_bg(num_goals)
 
-#StrD1SNr_putamen.disable_learning()
 StrD1SNc_put.disable_learning()
 
 def M(axis, theta):
@@ -187,8 +157,7 @@ def angle_in_plane(v1,v2,n):
 
 cerror = np.zeros(num_trials+num_rotation_trials+num_test_trials)
 
-
-# Reservoir
+# Reservoir training
 
 # Compute the mean reward per trial
 R_mean = np.zeros(100)
@@ -230,7 +199,7 @@ for t in range(num_trials+num_rotation_trials+num_test_trials):
     if(simulation_type == 0):
         current_parms =  np.copy(parameter_history[goal_id])
 
-    #Turn this on for simulations with strategy
+    # Turn this on for simulations with strategy
     if(t>(num_trials+2) and t<(num_trials+num_rotation_trials-10) ):
         current_parms = np.copy(parameter_history[2])
 
