@@ -47,15 +47,15 @@ The three conditions of the adaptation task can be simulated by making the appro
 python run_adaptation.py
 ```
 
-The scripts will initialize the random concrete action, optionally run the initial basal ganglia training and then run the full model simulation with 2 or 8 goals. A full simulation will take **several hours**.
+The scripts will initialize the random concrete action, run the initial basal ganglia training and then run the full model simulation with 2 or 8 goals using the cerebellar reservoir. A full simulation will take **several hours**.
 
 The code has been tested on Linux Ubuntu 22.4 Mint 20.2, using python 3.9 and 3.8 and ANNarchy version 4.7. We cannot assure that it will work on other versions.
 
-The reaching code will output two files:
+The reaching script will output two files:
 
 * `error_history_bg.npy` which is a numpy array with the error on each trial of the initial basal ganglia training procedure.
 * `error.npy`  which is a numpy array with the error during the training with 2 or 8 goals of the full model.
 
-The adaptation code will save the directional error in `angle3.npy` and the aiming error in `cerror.npy`.
+The adaptation script will save the directional error in `angle3.npy` and the aiming error in `cerror.npy`.
 
 
