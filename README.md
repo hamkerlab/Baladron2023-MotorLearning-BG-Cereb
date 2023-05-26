@@ -4,7 +4,8 @@ Code for the paper:
 
 Baladron, J., Vitay, J., Fietzek, T. and Hamker, F. H. \
 **The contribution of the basal ganglia and cerebellum to motor learning: a neuro-computational approach**\
-*submitted.*
+*PLoS Comput Biol 19(4): e1011024*
+[doi:10.1371/journal.pcbi.1011024](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1011024)
 
 ## Dependencies
 
